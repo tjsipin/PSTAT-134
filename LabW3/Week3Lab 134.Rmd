@@ -1,0 +1,278 @@
+---
+title: "Week3 Lab 134"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+header-includes: \usepackage{mathtools}
+urlcolor: blue
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=TRUE, 
+                      cache=TRUE, 
+                      fig.width=5, 
+                      fig.height=5,
+                      fig.align='center')
+indent1 = '    '      
+indent2 = paste(rep(indent1, 2), collapse='')
+```
+
+
+
+## 1. Obtain dataset *Discrim*
+### (a) Dataset description and some EDA
+
+*Discrim* is a simulated dataset containing $n=28$ job interview outcomes of a company on $p=4$ features. 
+
+- `HIRING`: response variable with two levels, "1" stands for YES and "0" for NO
+- `EDUCATION`: years of college education, three values are available
+- `EXPERIENCE`: years of working experience
+- `GENDER`: "1" for MALE and "0" for FEMALE
+
+```{r, warning=FALSE, message = FALSE, indent=indent1}
+library(tidyverse)
+# Read the txt file from your current working directory 
+Dis = read.table("Discrim.txt", header=T)
+# Convert Dis into a data frame
+Dis = as_tibble(Dis)
+str(Dis)
+```
+
+Convert categorical variables to factor since glm() treats them as numeric otherwise.
+
+```{r, warning=FALSE, message=FALSE,indent=indent1}
+# install.packages("dplyr")
+library(dplyr)
+Dis = Dis %>%
+  mutate(HIRING=as.factor(ifelse(HIRING==0,"No", "Yes"))) %>%
+  mutate(GENDER=as.factor(ifelse(GENDER==0,"F", "M")))
+str(Dis)
+```
+
+    Let's check some explanatory analysis on the dataset.
+    
+```{r,comment=NA, indent=indent1}
+table(Dis$GENDER,Dis$HIRING)
+```
+
+    - Among 15 FEMALE applying, 3 have been hired.
+
+    - Among 13 MALE applying, 6 have been hired.
+
+### (b) Interesting questions 
+
+Based on the dataset, we may pose some intriguing questions like
+
+* Why is a logistic regression model better than a linear one?  
+* What is the probability of being hired given some features of candidates (`EDUCATION`, `EXPERIENCE` and `GENDER` of a candidate)?  
+* Does each predictor actually have impact on the estimated probabilities in the logistic model?  
+
+
+## 2. Logistic Regression
+
+### (a) Review the theoretical background
+
+$$
+\operatorname{logit}(p)=\ln \left(\frac{p}{1-p}\right)=\beta^{\prime} X \Longleftrightarrow p(Y=j \mid X)=\frac{e^{\beta^{\prime} X}}{1+e^{\beta^{\prime} X}}
+$$
+where $\beta^{\prime} X=\beta_{0}+\beta_{1} X_{1}+\beta_{2} X_{2}+\cdots+\beta_{p} X_{p}$
+
+
+### (b) Build and summarise a logistic regression model 
+
+- **`glm()`** is used to fit generalized linear models. The usage of `glm()` is pretty much like that of `lm()` with one more necessary argument `family`. Specifying **`family=binomial`** produces a logistic regression model. By default, `family=binomial` uses logit as its link function. More options such as probit, log-log link are also available. As described previously, `HIRING` is our response and `EDUCATION`, `EXPERIENCE` and `GENDER` are predictors.
+
+- **`summary()`** is a generic function that is used to produce result summaries of various model fitting functions. We can call the `summary()` of our glm object after fitting it and expect several things to be reported:
+
+    * _Call_: this is R reminding us what the model we ran was, what options we specified, etc  
+    * _Deviance residuals_: measures of model fit. This part of output shows the distribution of the deviance residuals for individual cases used in the model  
+    * _Coefficients_: shows the coefficients, their standard errors, the Z-statistic (sometimes called a Wald Z-statistic), and the associated p-values  
+    * _Fit indices_: goodness-of-fit measures including the null and deviance residuals, and the AIC. 
+
+```{r glm, indent=indent1}
+# Specify 'family=binomial' is important!
+glm.fit = glm(HIRING ~ EDUCATION + EXPERIENCE + GENDER,
+             data=Dis, family=binomial)
+# Summarize the logistic regression model
+summary(glm.fit)
+```
+  
+### (c) Interpret coefficients 
+In above results, Both `EXPERIENCE` and `GENDERM` are statistically significant at level 0.05.
+
+Let's take a look at the interpretation of the model coefficients. So, our model is 
+
+$$ log(\frac{p}{1-p})  = \beta_0 + \beta_1 * Education  +\beta_2 * Experience + \beta_3 * Gender $$ 
+
+where p = probability of getting hired. 
+
+The logistic regression coefficients, if logit link function is used, give the change in the log odds of the outcome for a one unit increase in a predictor variable, while others being held constant.  
+
+* The variable `EXPERIENCE` has a coefficient `r round(summary(glm.fit)$coef[3],digits=4)`. For every one unit change in `EXPERIENCE`, the log odds of getting hired (versus not-hired) increases by 0.9098, holding other variables fixed. Mathematically, after 1 unit increase of experience, $$log(\frac{p_{new}}{1-p_{new}}) =0.9098 +  log(\frac{p_{old}}{1-p_{old}}).$$ 
+
+This means that the odds of being hired increase by $e^{0.9}$ (new odds = $e^{0.9}$ old odds).
+
+* The variable `EDUCATION` has a coefficient `r round(summary(glm.fit)$coef[2],digits=4)`. For a one unit increase in `EDUCATION`, the log odds of being hired increases by 1.1549, holding other variables fixed  
+
+* The indicator variable for `GENDERM` has a slightly different interpretation. The variable `GENDERM` has a coefficient `r round(summary(glm.fit)$coef[4],digits=4)`, meaning that the indicator function of `MALE` has a regression coefficient `r round(summary(glm.fit)$coef[4],digits=4)`. That being said, the gender `MALE` versus `FEMALE`, changes the log odds of getting hired by 5.6037.
+
+* If P-val < 0.05, then reject $H_0$ and we ssay that the predictor is significant.
+
+# Poisson regression
+
+- For count/rate data
+
+Examples:
+
+- Number of cargo ships damaged by waves (classic example given by
+McCullagh & Nelder, 1989).
+
+- Daily homicide counts in California (Grogger, 1990)
+
+- Number of arrests resulting from 911 calls.
+
+## (a) Model
+
+- Response: Poisson distribution and model the expected value of $Y$, denoted by $E(Y)=\mu$.
+- Predictors : For now, just 1 explanatory variable $x$ as example.
+
+- Link: We could use
+
+- Identity link, which gives us $\mu=\alpha+\beta x$
+
+Problem: a linear model can yield $\mu<0$, while the possible values for $\mu \geq 0$
+
+- Log link (much more common) $\log (\mu)$, which is the "natural parameter" of Poisson distribution, and the log link is the "canonical link" for GLMs with Poisson distribution.
+
+The Poisson regression model for counts (with a $\log \operatorname{link}$ ) is
+$$
+\log (\mu)=\alpha+\beta x
+$$
+
+This is often referred to as "Poisson loglinear model".
+
+For this single variate poisson, let's see how does 1 unit change in predictor affects response (count).
+
+$$
+\log (\mu)=\beta_0+\beta_1 x
+$$
+Consider distinct $x\left(x_{1} \& x_{2}\right)$ such that the difference between them equals 1 . For example, $x_{1}=10$ and $x_{2}=11$ :
+$$
+x_{2}=x_{1}+1
+$$
+The expected value of $\mu$ when $x=10$ is
+$$
+\mu_{1}=e^{\alpha} e^{\beta x_{1}}=e^{\alpha} e^{\beta(10)}
+$$
+The expected value of $\mu$ when $x=x_{2}=11$ is
+$$
+\begin{aligned}
+\mu_{2} &=e^{\alpha} e^{\beta x_{2}} \\
+&=e^{\alpha} e^{\beta\left(x_{1}+1\right)} \\
+&=e^{\alpha} e^{\beta x_{1}} e^{\beta} \\
+&=e^{\alpha} e^{\beta(10)} e^{\beta} = \mu_{1}e^{\beta}
+\end{aligned}
+$$
+A change in $x$ has a multiplicative effect on the mean of $Y$.
+
+Case 1: If $\beta=0$, then $e^{0}=1$ and
+
+- $\mu_{1}=e^{\alpha}$.
+
+- $\mu_{2}=e^{\alpha}$.
+
+- $\mu=E(Y)$ is not related to $x$.
+
+Case 2: If $\beta>0$, then $e^{\beta}>1$ and
+
+- $\mu_{1}=e^{\alpha} e^{\beta x_{1}}$
+
+- $\mu_{2}=e^{\alpha} e^{\beta x_{2}}=e^{\alpha} e^{\beta x_{1}} e^{\beta}=\mu_{1} e^{\beta}$
+
+- $\mu_{2}$ is $e^{\beta}$ times larger than $\mu_{1}$.
+
+
+Case 3:  If $\beta<0$, then $0 \leq e^{\beta}<1$
+
+- $\mu_{1}=e^{\alpha} e^{\beta x_{1}}$.
+
+- $\mu_{2}=e^{\alpha} e^{\beta x_{2}}=e^{\alpha} 
+e^{\beta x_{1}} e^{\beta}=\mu_{1} e^{\beta}$.
+
+- $\mu_{2}$ is $e^{\beta}$ times smaller than $\mu_{1}$.
+
+
+## (b) Example of model 
+
+Suppose we want to know how many scholarship offers a high school baseball player in a given county receives based on their school division (“A”, “B”, or “C”) and their college entrance exam score (measured from 0 to 100).
+
+
+
+```{r}
+
+#make this example reproducible
+set.seed(1)
+
+#create dataset
+data <- data.frame(offers = c(rep(0, 50), rep(1, 30), rep(2, 10), rep(3, 7), rep(4, 3)),
+                   division = sample(c("A", "B", "C"), 100, replace = TRUE),
+                   exam = c(runif(50, 60, 80), runif(30, 65, 95), runif(20, 75, 95)))
+
+#create histogram
+library(ggplot2)
+ggplot(data, aes(offers, fill = division)) +
+  geom_histogram(binwidth=.5, position="dodge")
+```
+
+Above is a visualization of number of offers received by players based on division. We see most players receive either 0 or 1 offer. 
+
+Let's fit the model and interpret some coefficents. 
+
+```{r}
+#fit the model
+model <- glm(offers ~ division + exam, family = "poisson", data = data)
+
+#view model output
+summary(model)
+
+```
+
+## (c) Interpreting coefficients
+
+
+The coefficient for exam is 0.08614. i.e; The expected log count for number of offers for a one-unit increase in exam is 0.08614. An easier way to interpret this is to take the exponent as in (b), that is $e^{0.08614} = 1.09$. So, there is a 9% increase in the number of offers received for each additional point scored on the entrance exam.
+
+Let's look at coefficient for division B,  0.07156.
+Take exponent, $e^{ 0.07156} = 1.07$ which means players in divisionB receive 7% more offers than players in division A. Note the difference is not significant (p-value  >0.05).
+
+Similary, for division C, we have $e^{0.26906} = 1.309$ which means players in division C receive more offer than players in division A by 30%. Again, not significant (p-value >0.05).
+
+
+# 3 GLMM
+
+
+Example : A large HMO wants to know what patient and physician factors are most related to whether a patient’s lung cancer goes into remission after treatment as part of a larger study of treatment outcomes and quality of life in patients with lunger cancer. A variety of outcomes were collected on patients, who are nested within doctors, who are in turn nested within hospitals.
+
+Below we use the glmer command to estimate a mixed effects logistic regression model with Il6, CRP, and LengthofStay as patient level continuous predictors, CancerStage as a patient level categorical predictor (I, II, III, or IV), Experience as a doctor level continuous predictor, and a random intercept by DID, doctor ID.
+```{r}
+hdp <- read.csv("https://stats.idre.ucla.edu/stat/data/hdp.csv")
+hdp <- within(hdp, {
+  Married <- factor(Married, levels = 0:1, labels = c("no", "yes"))
+  DID <- factor(DID)
+  HID <- factor(HID)
+  CancerStage <- factor(CancerStage)
+})
+#install.packages("lme4")
+library(lme4)
+# estimate the model and store results in m
+m <- glmer(remission ~ IL6 + CRP + CancerStage + LengthofStay + Experience +
+             (1 | DID), data = hdp, family = binomial)
+
+# print the mod results without correlations among fixed effects
+summary(m)
+```
+# References: 
+
+https://stats.oarc.ucla.edu/r/dae/mixed-effects-logistic-regression/
+
+https://www.statology.org/poisson-regression/

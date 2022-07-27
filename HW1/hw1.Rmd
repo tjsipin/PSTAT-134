@@ -1,0 +1,319 @@
+---
+title: "HW 1"
+author: "TJ Sipin"
+date: '2022-06-25'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      cache = TRUE)
+library(ggplot2)
+library(dplyr)
+library(car)
+library(tidyr)
+```
+
+## Problem 1 (Nile River data)
+
+(a)
+
+```{r Nile River data}
+stem(Nile, scale = 1)
+```
+
+The median flow quantity (in $10^8 m^3$) at Aswan in the Nile River is around the 800s and is a little right-skewed.
+
+(b) 
+
+```{r}
+plot(Nile)
+```
+
+The time series plot confirms that the median is around the 800s.
+
+## Problem 2 (Curvature comparison)
+
+Draw curves of the following functions:
+
+$$
+y = x, \quad y = 2\sqrt{x+1}-2, \quad y = 3(x+1)^{1/3} - 3, \quad y = \log(x+1), \quad y = -2(x+1)^{-1/2} - 1, \quad y = -3(x+1)^{-1/3} - 1
+$$
+
+```{r pressure, echo=FALSE}
+x <- seq(-10,10,by = 0.01)
+y1 <- x
+y2 <- 2*sqrt(x+1) - 2
+y3 <- 3*(x+1)^(1/3) - 3
+y4 <- log(x+1)
+y5 <- -2*(x+1)^(-1/2) - 1
+y6 <- -3*(x+1)^(-1/3) - 1
+
+p2_df <- data.frame(x = x,
+                    y1 = y1,
+                    y2 = y2,
+                    y3 = y3,
+                    y4 = y4,
+                    y5 = y5,
+                    y6 = y6)
+
+ggplot(p2_df, 
+       aes(x = x)) + 
+  geom_line(aes(y = y1,
+                color = 'y = x')) + 
+  geom_line(aes(y = y2,
+                color = '2sqrt(x + 1) - 2')) + 
+  geom_line(aes(y = y3,
+                color = '3(x + 1)^(1/3) - 3')) + 
+  geom_line(aes(y = y4,
+                color = 'log(x + 1)')) + 
+  geom_line(aes(y = y5,
+                color = '-2(x + 1)^(-1/2) - 1')) +
+  geom_line(aes(y = y6,
+                color = '-3(x + 1)^(-1/3) - 1'))
+```
+
+The graph of the log function starts at x = -1 and increases strongly then levels out starting around x = 0.
+
+
+## Problem 3 (Baby weight data)
+
+```{r}
+baby <- read.delim("data/DISTRESS.DAT", header = FALSE) %>%
+  mutate_at(.vars = 1:5,
+            .funs = gsub,
+            pattern = "\\*",
+            replacement = "") %>%
+  mutate_at(.vars = 1:5,
+            .funs = as.numeric)
+```
+
+(a)
+
+```{r}
+baby_vector <- c(baby[[1]], baby[[2]], baby[[3]], baby[[4]], baby[[5]])
+baby_stem <- stem(baby_vector, scale = 1)
+baby_box <- boxplot(baby, notch = T, ylab = "weight")
+baby_t <- log(baby)
+baby_t_box <- boxplot(baby_t, notch = T, ylab = "log(weight)")
+baby_t_vector <- c(baby_t[[1]], baby_t[[2]], baby_t[[3]], baby_t[[4]], baby_t[[5]])
+baby_t_stem <- stem(baby_t_vector, scale = 2)
+```
+
+The boxplots do not look different, though the transformed data looks to have a wider distribution for each column. The stem-and-leaf displays are different however. Taking the log of the data causes the distribution to be less skewed.
+
+
+(b)
+
+```{r}
+baby_raw <- read.delim("data/DISTRESS.DAT", header = FALSE)
+baby_raw_vector <- c(baby_raw[[1]], baby_raw[[2]],
+                     baby_raw[[3]], baby_raw[[4]],
+                     baby_raw[[5]])
+baby_deceased <- grep('\\*', baby_raw_vector, value = T)
+baby_deceased <- baby_deceased %>%
+  gsub(pattern = "\\*",
+       replacement = "") %>%
+  as.numeric()
+baby_alive <- baby[baby != baby_deceased]
+
+x1 <- median(log(baby_deceased))
+y1 <- var(log(baby_deceased))
+
+x2 <- median(log(baby_alive))
+y2 <- var(log(baby_alive))
+
+plot(c(x1, x2), c(y1, y2)) 
+lines(c(x1, x2), c(y1, y2))
+b = -0.003058
+p = 0 # use log to transform data
+
+boxplot(log(baby_alive), log(baby_deceased), notch = T,
+        ylab = "weight (log (kg))",
+        xlab = "alive vs. deceased")
+```
+
+After finding the value of $b$ to equal 0, $p = 0$ and we use log to transform the weight. The notches do not seem to overlap, so they are not significantly different (at a roughly 95% level).
+
+(c) 
+
+```{r}
+boxplot((baby_alive), (baby_deceased), notch = T,
+        ylab = "weight (kg)",
+        xlab = "alive vs. deceased")
+stem(baby_alive)
+stem(baby_deceased, scale = .4)
+```
+
+A specific weight a baby with severe idiopathic respiratory disease may die is around 1.5 to 1.6 kg, though may be even lower (around 1.4 to 1.8)
+
+## Problem 4 (airquality data)
+
+```{r}
+air <- airquality %>%
+  select(c('Ozone', 'Solar.R', 'Wind', 'Temp')) %>%
+  drop_na()
+```
+
+(a) 
+
+
+```{r}
+air_Solar.R <- air %>%
+  select(c(Ozone, Solar.R)) 
+air_Wind <- air %>%
+  select(c(Ozone, Wind))
+air_Temp <- air %>%
+  select(c(Ozone, Temp))
+
+air_Solar.R$Solar.R <- 
+  sort(air_Solar.R$Solar.R, decreasing = F)
+air_Wind$Wind <- 
+  sort(air_Wind$Wind, decreasing = F)
+air_Temp$Temp <- 
+  sort(air_Temp$Temp, decreasing = F)
+
+
+
+y1L <- air_Solar.R$Ozone[1:37] %>% median()
+y1M <- air_Solar.R$Ozone[38:74] %>% median()
+y1R <- air_Solar.R$Ozone[75:111] %>% median()
+
+y2L <- air_Wind$Ozone[1:37] %>% median()
+y2M <- air_Wind$Ozone[38:74] %>% median()
+y2R <- air_Wind$Ozone[75:111] %>% median()
+
+y3L <- air_Temp$Ozone[1:37] %>% median()
+y3M <- air_Temp$Ozone[38:74] %>% median()
+y3R <- air_Temp$Ozone[75:111] %>% median()
+
+x1L <- air_Solar.R$Solar.R[1:37] %>% median()
+x1M <- air_Solar.R$Solar.R[38:74] %>% median()
+x1R <- air_Solar.R$Solar.R[75:111] %>% median()
+
+x2L <- air_Wind$Wind[1:37] %>% median()
+x2M <- air_Wind$Wind[38:74] %>% median()
+x2R <- air_Wind$Wind[75:111] %>% median()
+
+x3L <- air_Temp$Temp[1:37] %>% median()
+x3M <- air_Temp$Temp[38:74] %>% median()
+x3R <- air_Temp$Temp[75:111] %>% median()
+
+ggplot() + 
+  geom_point(aes(x = c(x1L, x1M, x1R),
+                 y = c(y1L, y1M, y1R)),
+             color = 'red') + 
+  geom_point(aes(x = air_Solar.R$Solar.R,
+                 y = air_Solar.R$Ozone)) + 
+  geom_line(aes(x = c(x1L, x1M, x1R),
+                 y = c(y1L, y1M, y1R)),
+            color = 'red') +
+  ggtitle('Tukey\'s three median plot for Ozone vs. Solar.R') + 
+  xlab('Solar.R') + 
+  ylab('Ozone')
+
+ggplot() + 
+  geom_point(aes(x = c(x2L, x2M, x2R),
+                 y = c(y2L, y2M, y2R)),
+             color = 'orange') + 
+  geom_point(aes(x = air_Wind$Wind,
+                 y = air_Wind$Ozone)) + 
+  geom_line(aes(x = c(x2L, x2M, x2R),
+                 y = c(y2L, y2M, y2R)),
+             color = 'orange') +
+  ggtitle('Tukey\'s three median plot for Ozone vs. Wind') + 
+  xlab('Wind') + 
+  ylab('Ozone')
+
+ggplot() + 
+  geom_point(aes(x = c(x3L, x3M, x3R),
+                 y = c(y3L, y3M, y3R)),
+             color = 'blue') + 
+  geom_point(aes(x = air_Temp$Temp,
+                 y = air_Temp$Ozone)) + 
+  geom_line(aes(x = c(x3L, x3M, x3R),
+                 y = c(y3L, y3M, y3R)),
+             color = 'blue') +
+  ggtitle('Tukey\'s three median plot for Ozone vs. Temperature') + 
+  xlab('Temperature') + 
+  ylab('Ozone')
+```
+
+(b)
+
+```{r}
+ggplot() + 
+  geom_point(aes(x = air_Solar.R$Solar.R,
+                 y = air_Solar.R$Ozone^2),
+             color = 'red') +
+  ggtitle('Ozone vs. Solar.R')
+
+ggplot() + 
+  geom_point(aes(x = air_Wind$Wind,
+                 y = air_Wind$Ozone^0.3),
+             color = 'orange') +
+  ggtitle('Ozone vs. Wind')
+
+ggplot() + 
+  geom_point(aes(x = air_Temp$Temp,
+                 y = air_Temp$Ozone^0.1),
+             color = 'blue') + 
+  ggtitle('Tukey\'s three median plot for Ozone vs. Temp')
+```
+
+The notes said to lower the power of $x$, but I feel like it's better to lower the power of $y$. I am more satisfied with the 2nd and 3rd graphs (lower power of $y$) than with the 1st graph. They also look more homoscedastic. 
+
+## Problem 5 (Oregon temperature data).
+
+```{r}
+
+oregon <- read.csv('data/ortann.csv')
+
+# tann vs. latitude
+tann_lat <- lowess(x = oregon$tann,
+                   y = oregon$latitude,
+                   f = 2/3)
+# tann vs. longitude
+tann_long <- lowess(x = oregon$tann,
+                    y = oregon$longitude,
+                    f = 2/3)
+
+# tann vs. elevation
+tann_elev <- lowess(x = oregon$tann,
+                    y = oregon$elevation,
+                    f = 2/3)
+
+
+ggplot() + 
+  geom_line(aes(x = tann_lat$x,
+                y = tann_lat$y),
+            color = 'blue') + 
+  geom_point(aes(x = oregon$tann,
+                 y = oregon$latitude),
+             color = 'blue') +
+  xlab('Annual average temperature') +
+  ylab('Latitude')
+
+ggplot() + 
+  geom_line(aes(x = tann_long$x,
+                y = tann_long$y),
+            color = 'red') + 
+  geom_point(aes(x = oregon$tann,
+                 y = oregon$longitude),
+             color = 'red') + 
+  xlab('Annual average temperature') + 
+  ylab('Longitude')
+
+ggplot() + 
+  geom_line(aes(x = tann_elev$x,
+                y = tann_elev$y),
+            color = 'orange') + 
+  geom_point(aes(x = oregon$tann,
+                 y = oregon$elevation),
+             color = 'orange') + 
+  xlab('Annual average temperature') + 
+  ylab('Elevation')
+
+```
+
+In Oregon, temperature tends to be pretty independent of latitude, though it tends to be slightly dependent of longitude as it increases going west. Elevation was most correlated with temperature, as temperature increases with a decrease in elevation.

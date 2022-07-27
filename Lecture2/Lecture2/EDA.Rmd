@@ -1,0 +1,189 @@
+---
+title: "EDA"
+author: "TJ Sipin"
+date: '2022-06-22'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## What is EDA?
+
+Exploratory Data Analysis (John W. Tukey) ←→ Confirmatory Data Analysis
+
+CDA requires assumptions. In practice, it is hard to check assumptions.
+
+-   Goal of EDA: simpler, but deeper description.
+-   Tools of EDA: simple arithmetic, easy-to-draw picture
+
+EDA is numerical, counting, and graphical detective work. EDA is an essential step in data analysis to draw our intuition before modelling. EDA can provide crucial clues to establish proper assumptions.
+
+Main components of EDA (4R) (in no particular order)
+
+-   Revelation: visual display
+
+-   Re-expression: simplify the behavior of data and clarify the analysis
+
+-   Resistance: keep outliers from affecting results
+
+-   Residual: attention on what remains in the data after analysis
+
+Supporting your argument, EDA constitutes many pages.
+
+> "I use this model based on what I found in the data through EDA."
+
+## Exploring the data
+
+Before we start learning...\
+Do NOT blindly apply what you think is fancy.
+
+Take advantage of domain knowledge to understand what data is telling you. It is always worth searching how the data is collected.
+
+Example:
+
+$$Y: \text{ blood pressure} \qquad X: \text{ amount of salt consumption}$$ How these components are collected may change which model is best for the given assumptions.
+
+Albeit boring, EDA is still a key player to make different quality of data analysis.
+
+"EDA is not about the fnacy, complicated graph. It's about the simple graphs, showing intuition."
+
+## Stem-and-leaf display
+
+Basic tools to see the distribution
+
+-   Histogram
+-   Stem-and-leaf display: organize data in histogram style but with digit number (stem function in R)
+
+What do we want to detect?
+
+![](images/IMG_5349.JPG){width="256"}
+
+1.  Centering -\> location
+2.  Clusters (multi-model situation)
+3.  Asymmetry
+4.  Width (range) -\> spread (variance)
+5.  Separation (gap)
+6.  Irregularities (outliers)
+
+```{r, eval=FALSE}
+stem(x, scale = 1)
+```
+
+scale: the indicator for the vertical length (default: 1) == size of "bins" in histogram.
+
+scale \> 1: long version - more detailed display
+
+scale \< 1: short version - rough display
+
+## Five number summary
+
+Five number summary: may not reveal the separation or irregularities (unlike stem-and-leaf display or histogram) but quick and general information.\
+(fivenum function in R)
+
+1.  minimum
+
+2.  lower hinge (HL )
+
+3.  median
+
+4.  upper hinge (HU )
+
+5.  maximum
+
+Note: originally, Tukey's definition of lower/upper hinges differs from the first/third quartiles. However, they are approximately the same.
+
+Note: resistant against outliers
+
+$$
+X_{(1)} = 1 \qquad X_{(2)} = 2 \qquad X_{(3)} = 3 \text{ or } 1000
+$$
+
+median: 2 for both cases
+
+mean: 2 or $\frac{10,003}{3}$
+
+## Measure of Spread
+
+![](images/paste-1233AF07.png){width="546"}
+
+## Measure of Symmetry
+
+![](images/paste-AD237C0A.png)
+
+## Box-and-Whisker plot
+
+![![](images/paste-CDEA785C.png) ![](images/paste-9E920BFE.png)](images/paste-17B85869.png)
+
+-   Do not show uni-model versus multi-model
+
+![![](images/paste-AD74B401.png)](images/paste-ABE6542D.png)
+
+-   Width proportional to sample size
+
+-   Length of notch inversely proportional to sample size
+
+![](images/paste-272F05C7.png)
+
+## Re-expression
+
+![](images/paste-2B9394B4.png)
+
+-   Reciprocals for ordered data
+
+## Ladder of Power
+
+![](images/paste-6917F26D.png)
+
+Note: counted data = counts
+
+## Aims of Re-expression
+
+![](images/paste-C1DCB07D.png)
+
+![](images/IMG_5369.JPG)
+
+-   Need to handle variance for good statistical tests
+
+-   **HOW TO MAKE THE CONNECTION BETWEEN VALUE OF RE-EXPRESSION AND MACHINE LEARNING**
+
+## Symmetrizing Re-expression
+
+![](images/paste-4B31F34F.png)
+
+![](images/paste-7DEAA677.png)
+
+$$
+H_L = Q_1 \qquad H_U = Q_3
+$$
+
+## Spread-versus-level plot
+
+![](images/paste-9D7D626C.png)
+
+If spread increases, location also increases
+
+![](images/paste-3E7284EE.png)
+
+## Making the Choice
+
+![](images/paste-394B404F.png)
+
+## Plot of Relationship
+
+![](images/paste-BD5DA4B6.png)
+
+![](images/paste-35629DB9.png)
+
+NOTE: Trade off -\> interpretibility vs. linearity
+
+## Resistant Line
+
+![](images/paste-DE86859B.png)
+
+![](images/paste-CC5621F2.png)
+
+![](images/paste-BDD1F160.png)
+
+![](images/paste-F8217BF0.png)

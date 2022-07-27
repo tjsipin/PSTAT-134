@@ -1,0 +1,302 @@
+---
+title: 'PSTAT 134: Homework 3'
+author: "TJ Sipin"
+date: "`r Sys.Date()`"
+output: html_document
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+```
+
+## Problem 1 (BigMac data)
+
+The data bicmac.txt includes economic data on 45 world cities from the
+period 1900-1991. The Economist magazine has published a Big Mac party
+index, which compares the costs of a Big Mac in various places, as a
+measure of inefficiency in currency exchange. The data contains
+following variables:
+
+• `BicMac` ($Y$): Minutes of labor required by an average worker to buy a
+Bic Mac and French fries
+
+• `Bread` ($X_1$): Minutes of labor required to buy one kilogram of bread
+
+• `BusFare` ($X_2$): The lowest cost of a ten-kilometer bus, train, or
+subway ticket, in U.S. dollars
+
+• `EngSal` ($X_3$): The average annual salary of an electrical engineer, in
+thousands of U.S. dollars
+
+• `EngTax` ($X_4$): The average Tax rate paid by engineers
+
+• `Service` ($X_5$): Annual cost of 19 services, primarily relevant to Europe
+and North America
+
+• `TeachSal` ($X_6$): The average annual salary of a primary school teacher,
+in thousands of U.S. dollars
+
+• `TeachTax` ($X_7$): The average tax rate paid by primary teachers
+
+• `VacDays` ($X_8$): Average days of vacation per year
+
+• `WorkHrs` ($X_9$): Average hours worked per year
+
+• `City` ($X_10$): Name of city We want to study how the cost of a Big Mac
+varies with economic indicators that describe each city.
+
+
+(a) First we apply a logarithmic transformation to every variable except $X_9$ and $X_10$ to make a linear relationship between the response and predictors.
+
+
+```{r bicmac}
+mac <- read.table(file = 'bigmac.txt', header = T)
+mac[1:9] <- log(mac[1:9])
+mac$WorkHrs <- as.numeric(mac$WorkHrs)
+```
+
+
+(b) Now we run a multiple linear regression model on our response on the other predictors (except `City`). 
+
+```{r lm}
+lm.mac <- lm(BigMac ~ . - City, data = mac)
+summary(lm.mac)
+```
+
+The only predictor that is significant at the 95% level is `BusFare`. The other significant predictors are `EngSal`, `Service`, and `TeachSal` at the 90% level.
+
+The fact that the highest significance level is 95% is not expected, as it seems that while there is a slight effect of economic predictors on the relative cost of a Big Mac and fries, one might think that there is a slightly higher effect. The predictors that are higher than then 90% level do make sense that they are more significant than the others. The typical salaries of the engineer and the teacher comprise the upper and lower end of salaries in an economy. Seeing that they are more or less equally significant in predicting the time of labor to buy a Big Mac and fries is plausible. Cost of (the 19) services is also plausible as a statistically significant predictor, since that intuitively seems like a broad indicator of the state of the local economy.
+
+(c) Use the `princomp` function to conduct PCA on our predictors then run a multiple regression of the response on all PCs.
+
+```{r PCA}
+mac.pca <- princomp(mac[2:10], scores = T)
+
+mac.pca.lm <- lm(mac$BigMac ~ ., data = data.frame(mac.pca$scores))
+summary(mac.pca.lm)
+```
+
+The multiple $R^2$ is the same as that of (b). This is likely since we did not reduce any dimensions because we kept all PCs. Something else that caught my eye is that there are more statistically significant coefficients in this model.
+
+
+```{r}
+lm(BigMac ~ Bread, data = mac) %>% summary()
+
+lm(mac$BigMac ~ Comp.1, data = data.frame(mac.pca$scores)) %>% summary()
+```
+
+The coefficient for `Bread` changes drastically: it goes from 0.105 to 0.641. The coefficient for `Comp.1` stays exactly the same at 0.001. This is likely due to the nature of principle components re-arranging variables using all the variables without loss of information. That is, when using `Comp.1` as the sole predictor, there is no loss of information, whereas when using `Bread` as the sole predictor, there is a loss of information. This then results in the adjustment for the coefficient for `Bread` and no adjustment for the coefficient for `Comp.1`.
+
+(e) Using the R function provided in lecture, apply the Contour Regression of the response on the other predictors.
+
+```{r}
+## This function is from [Sufficient Dimension Reduction - Methods and Applications with R]
+## By Bing Li
+## Function Set-up
+matpower = function(a, alpha){
+  a = round((a + t(a))/2, 7)
+  tmp = eigen(a)
+  return(tmp$vectors %*% diag((tmp$values)^alpha) %*% t(tmp$vectors))
+}
+
+discretize = function(y, h){
+  n = length(y)
+  m = floor(n/h)
+  y = y + .00001 * mean(y) * rnorm(n) 
+  yord = y[order(y)]
+  divpt = numeric()
+  for (i in 1:(h-1)) divpt = c(divpt, yord[i*m+1])
+  y1 = rep(0, n)
+  y1[y<divpt[1]] = 1
+  y1[y>=divpt[h-1]] = h
+  for (i in 2:(h-1)) y1[(y>=divpt[i-1]) & (y<divpt[i])] = i 
+  return(y1)
+}
+
+
+
+cr = function(x,y,percent){
+  
+  tradeindex12 = function(k,n){
+    j = ceiling(k/n)
+    i = k - (j-1)*n
+    return(c(i,j))
+  }
+  mu=apply(x,2,mean);signrt=matpower(var(x),-1/2)
+  z=t(t(x)-mu)%*%signrt
+  n=dim(x)[1];p = dim(x)[2]
+  
+  ymat=matrix(y,n,n)
+  deltay=c(abs(ymat - t(ymat)))
+  singleindex=(1:n^2)[deltay < percent*mean(deltay)]
+  
+  contourmat=diag(1,p)
+  for(k in singleindex){
+    
+    doubleindex=tradeindex12(k,n)
+    deltaz=z[doubleindex[1],]-z[doubleindex[2],]
+    contourmat=contourmat-deltaz %*% t(deltaz)
+    
+  }
+  signrt=matpower(var(x),-1/2)
+  return(signrt%*%eigen(contourmat)$vectors)
+}
+```
+
+First, we apply the `cr()` function on the response and the other predictors.
+
+```{r}
+mac.cr <- cr(mac[,2:10], mac[,1], 0.05)
+```
+
+Then, we make two plots: the response vs. the first principle component from (b); and the response vs. the first sufficient predictor from the contour regression.
+
+```{r}
+ggplot() +
+  geom_point(aes(x = mac.pca$scores[,1],
+                 y = mac$BigMac)) + 
+  labs(x = 'PC1',
+       y = 'Minutes to buy Big Mac and fries')
+
+
+ggplot() +
+  geom_point(aes(x = as.matrix((mac[,2:10])) %*%
+                   as.matrix(mac.cr[,1]),
+                 y = mac$BigMac)) + 
+  labs(x = 'CR1',
+       y = 'Minutes to buy Big Mac and fries')
+```
+
+There does not seem to be as strong of a correlation between the first principle component and the average minutes of labor to buy a Big Mac and fries, while there is a much clearer correlation for the first sufficient predictor from the contour regression. This is likely because the Central Subspace given by the contour regression contains the regression information of the response variable on the predictors.
+
+## Problem 2 (Pen digit data). 
+
+Using the data `pendigits.tra`, train the contour regression model to classify the digits 0, 6, and 9. 
+
+```{r}
+
+## Pen digit data
+pen.train <-read.table("pendigits.tra", sep=",")
+pen.tes <-read.table("pendigits.tes", sep=",")
+
+names(pen.train) = c(paste0(c("X"), rep(1:16)), "digit")
+names(pen.tes) = c(paste0(c("X"), rep(1:16)), "digit")
+
+str(pen.train)
+head(pen.train)
+dim(pen.train)
+
+train = pen.train %>% filter(digit==0|digit==6|digit==9)
+test = pen.tes %>% filter(digit==0|digit==6|digit==9)
+head(train)
+head(test)
+
+train_X = train[,1:16]
+train_Y = train[,17]
+test_X = test[,1:16]
+test_Y = test[,17]
+
+# CR
+x = train_X
+y = train_Y
+percent = 0.05
+CR_beta = cr(x, y, percent)
+CR_beta
+
+CR_train = as.matrix(x) %*% CR_beta
+CR_test = as.matrix(test_X) %*% CR_beta
+
+CR = as.data.frame(CR_test)
+CR$Y = test_Y
+CR$Y[which(CR$Y == 0)] = '0'
+CR$Y[which(CR$Y == 6)] = '6'
+CR$Y[which(CR$Y == 9)] = '9'
+CR$Y = as.factor(CR$Y)
+
+
+
+```
+```{r}
+ggplot() +
+  geom_point(aes(x = as.matrix(test_X) %*%
+                   as.matrix(CR_beta[,1]),
+                 y = as.matrix(test_X) %*%
+                   as.matrix(CR_beta[,2]),
+                 color = CR$Y)) + 
+  labs(x = 'CR1',
+       y = 'CR2',
+       color = 'Key')
+  
+
+
+```
+
+## Problem 3 (Kernel PCA).
+
+
+Write own code to apply Kernel PCA to the `iris` data using the kernel
+$$
+\kappa(\textbf{x,y}) = \text{exp} \left ( -\frac{1}{5} ||\textbf{x} - \textbf{y}|| ^2 \right ).
+$$
+
+Plot to show the result of kPCA.
+
+```{r}
+dat <- iris[,1:4] %>% as.data.frame()
+
+# set up kernel
+kernel <- function(dat) {
+  # vec <- as.vector(X - Y)
+  # exp(-(1/5) * sum(vec^2))
+  mat <- NULL
+  for (i in seq(1, nrow(dat))) {
+    for (j in seq(1, nrow(dat))) {
+      k_ij <- exp(-(1/5) * sum((dat[i,] - dat[j,])^2))
+      mat <- append(mat, k_ij)
+    }
+  }
+  mat <- matrix(mat, nrow=nrow(dat))
+  mat
+}
+
+K = kernel(dat)
+
+# recenter the kernel matrix
+L = matrix(1/nrow(dat), nrow=nrow(K), ncol=ncol(K))
+K2 = K - (L %*% K) - (K %*% L) + (L %*% K %*% L)
+
+# solve the eigen decomposition problem
+res = eigen(K2/nrow(dat))
+
+pc <- res$vectors[,1:2]/sqrt(res$values[1:2]) # choose first two
+## choosing all gives NaNs in row 150 since we are sqrt a neg eigenvalue
+
+# obtain the kPCA score vector
+score <- K2 %*% pc
+
+# visualize
+plot(score, col = as.integer(iris[,5]),
+     xlab = 'PC1',
+     ylab = 'PC2')
+```
+
+Now we compare our kPCA function from scratch with the `kpca()` function.
+
+```{r}
+# compare result with kPCA function
+
+library(kernlab)
+kpc <- kpca(~., dat, kernel='rbfdot',
+            kpar = list(sigma = .2), features = 2)
+head(pcv(kpc))
+# plot
+plot(rotated(kpc), col = as.integer(iris[,5]),
+     xlab = 'PC1', ylab = 'PC2')
+```
+
+They appear to be the same.

@@ -1,0 +1,547 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  pdftitle={Homework 2},
+  pdfauthor={TJ Sipin},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Homework 2}
+\author{TJ Sipin}
+\date{2022-07-06}
+
+\begin{document}
+\maketitle
+
+\hypertarget{problem-1-statistical-thinking.}{%
+\subsection{Problem 1 (Statistical
+thinking).}\label{problem-1-statistical-thinking.}}
+
+\begin{enumerate}
+\def\labelenumi{(\alph{enumi})}
+\tightlist
+\item
+  Consider
+  \(\text{Cov}(\textbf{A}y) = \textbf{A}\text{Cov}(y)\textbf{A}^T,\)
+  where \(\textbf{A} = (X^T X)^{-1} X^T\) and
+  \(y = \beta X + \epsilon\). Taking the notation
+  \[\hat \beta = (X^T X)^{-1} X^T y ,\] we have \[\begin{align}
+  \text{Cov}(\hat \beta ) &= \text{Cov}((X^T X)^{-1} X^T y) \\
+  &= \text{Cov}((X^T X)^{-1} X^T (X \beta + \epsilon)) \\
+  &= \text{Cov}((X^T X)^{-1} X^T X \beta + (X^T X)^{-1} X^T \epsilon)\\
+  &= \text{Cov} (I \beta + (X^T X)^{-1} X^T \epsilon)\\
+  &= \text{Cov} (X^T X)^{-1} X^T \epsilon) \\
+  &= \text{Cov}(\textbf{A}\epsilon) \\
+  &= \textbf{A}\text{Cov}(\epsilon)\textbf{A}^T \\
+  &= (X^T X)^{-1} X^T \sigma^2 ((X^T X)^{-1} X^T)^T \\
+  &= \sigma^2 (X^T X)^{-1} X^T X \left ((X^T X)^{-1} \right )^T \\
+  &= \sigma^2 (X^T X)^{-1}.
+  \end{align}\]
+\end{enumerate}
+
+The variance of \(\hat\beta_1\) is given by the second diagonal of the
+above matrix. That is,
+
+\[
+(i) \qquad 
+\text{Var}(\hat \beta_1 ) = \left [ \sigma^2 (X^T X)^{-1}\right ]_{2,2}.
+\]
+
+\begin{enumerate}
+\def\labelenumi{(\alph{enumi})}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  Splitting the possible range of \(x\) into 100 mutually exclusive
+  windows and collecting the equal amount of sample from each slot is
+  more efficient in terms of estimating \(\beta_1\). So when we split
+  the possible range of \(x\) into 100 \emph{mutually exclusive}
+  windows, then we decrease variance of \(x\), which in turn, decreases
+  the variance of \(\hat\beta\), as we see in \((i)\).
+\end{enumerate}
+
+\hypertarget{problem-2-prediction-and-confidence-intervals}{%
+\subsection{Problem 2 (Prediction and confidence
+intervals)}\label{problem-2-prediction-and-confidence-intervals}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Regression for cars data}
+\NormalTok{lm.out }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(dist }\SpecialCharTok{\textasciitilde{}}\NormalTok{ speed, }\AttributeTok{data =}\NormalTok{ cars)}
+
+\CommentTok{\# create new predictor }
+\NormalTok{newx }\OtherTok{=} \FunctionTok{seq}\NormalTok{(}\FunctionTok{min}\NormalTok{(cars}\SpecialCharTok{$}\NormalTok{speed), }\FunctionTok{max}\NormalTok{(cars}\SpecialCharTok{$}\NormalTok{speed), }\AttributeTok{by =} \FloatTok{0.1}\NormalTok{)}
+
+\CommentTok{\# get confidence interval for each element in newx}
+\NormalTok{conf\_interval }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(lm.out, }
+                         \AttributeTok{newdata=}\FunctionTok{data.frame}\NormalTok{(}\AttributeTok{speed=}\NormalTok{newx),}
+                         \AttributeTok{interval =} \StringTok{"confidence"}\NormalTok{,}
+                         \AttributeTok{level =} \FloatTok{0.95}\NormalTok{)}
+
+\CommentTok{\# get prediction interval for each element in newx}
+\NormalTok{pred\_interval }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(lm.out,}
+                         \AttributeTok{newdata =} \FunctionTok{data.frame}\NormalTok{(}\AttributeTok{speed=}\NormalTok{newx),}
+                         \AttributeTok{interval =} \StringTok{"prediction"}\NormalTok{,}
+                         \AttributeTok{level =} \FloatTok{0.95}\NormalTok{)}
+\CommentTok{\# plot data points}
+\FunctionTok{plot}\NormalTok{(cars}\SpecialCharTok{$}\NormalTok{speed, cars}\SpecialCharTok{$}\NormalTok{dist, }
+     \AttributeTok{main =} \StringTok{"Regression"}\NormalTok{,}
+     \AttributeTok{xlab =} \StringTok{"Speed"}\NormalTok{,}
+     \AttributeTok{ylab =} \StringTok{"Distance"}\NormalTok{)}
+
+\CommentTok{\# regression line}
+\FunctionTok{abline}\NormalTok{(lm.out, }\AttributeTok{col =} \StringTok{\textquotesingle{}lightblue\textquotesingle{}}\NormalTok{)}
+
+\CommentTok{\# add lower end of CI}
+\FunctionTok{lines}\NormalTok{(newx, conf\_interval[,}\DecValTok{2}\NormalTok{], }\AttributeTok{col =} \StringTok{\textquotesingle{}blue\textquotesingle{}}\NormalTok{, }\AttributeTok{lty =} \DecValTok{2}\NormalTok{)}
+\CommentTok{\# add upper end of CI}
+\FunctionTok{lines}\NormalTok{(newx, conf\_interval[,}\DecValTok{3}\NormalTok{], }\AttributeTok{col =} \StringTok{\textquotesingle{}blue\textquotesingle{}}\NormalTok{, }\AttributeTok{lty =} \DecValTok{2}\NormalTok{)}
+\CommentTok{\# add lower end of PI}
+\FunctionTok{lines}\NormalTok{(newx, pred\_interval[,}\DecValTok{2}\NormalTok{], }\AttributeTok{col =} \StringTok{\textquotesingle{}red\textquotesingle{}}\NormalTok{, }\AttributeTok{lty =} \DecValTok{2}\NormalTok{)}
+\CommentTok{\# add upper end of PI}
+\FunctionTok{lines}\NormalTok{(newx, pred\_interval[,}\DecValTok{3}\NormalTok{], }\AttributeTok{col =} \StringTok{\textquotesingle{}red\textquotesingle{}}\NormalTok{, }\AttributeTok{lty =} \DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{hw2_files/figure-latex/problem 2-1.pdf}
+
+The prediction interval is wider than the confidence interval since the
+confidence interval pertains to the median (at a 95\% level), while the
+prediction interval pertains to all points in the relationship of
+distance and speed within a 95\% level.
+
+\hypertarget{problem-3-weighted-least-squares.}{%
+\subsection{Problem 3 (Weighted least
+squares).}\label{problem-3-weighted-least-squares.}}
+
+\begin{enumerate}
+\def\labelenumi{(\alph{enumi})}
+\tightlist
+\item
+  Derive the BLUE of \(\beta_0\) and \(\beta_1\) for
+\end{enumerate}
+
+\[
+y_i \sim^{\text{indep}} N(\beta_0 + \beta_1 x_i, x_i^2 \sigma^2), \qquad i = 1, \dots, n.
+\]
+
+\emph{Solution.} Here, we have
+\(\epsilon \sim N(0, \sigma^2 \textbf{V}),\) where
+\(\textbf V = x_i^2I, \text{ for } i = 1,\dots, n\). The OLS estimator
+is BLUE when \(\epsilon \sim (0, \sigma^2 I).\) Since \(\textbf V\) can
+be decomposed as \(\textbf V = (x_i I) (x_i I)^T\), it follows that
+
+\[
+\text{Cov}((x_i I)^{-1} \epsilon) = \sigma^2 (x_iI)^{-1} x_i I (x_i I)^T ((x_i I )^{-1})^T = \sigma^2 I.
+\]
+
+This allows us to change the OLS problem to
+
+\[
+(x_i I)^{-1}Y = (x_i I)^{-1}X \beta + (x_i I)^{-1} \epsilon, \quad (x_i I)^{-1} \sim N(0, \sigma^2 I).
+\]
+
+Thus, we can get BLUE from the OLS estimator from the changed problem:
+
+\[ (ii)
+\begin{aligned}
+\hat\beta &= (X^T((x_i I)^T)^{-1} (x_i I)^{-1} X)^{-1}((x_i I)^{-1} X)^T (x_i I)^{-1} Y \\
+&= (X^T (x_i I x_i I^T)^{-1} X)^{-1} X^T (x_i I x_i I^T)^{-1} Y \\
+&= (X^T (x_i I x_i I^T)^{-1} X)^{-1} X^T (x_i I x_i I^T)^{-1} Y \\
+&= (X^T(x_i ^2 I)^{-1} X)^{-1} X^T(x_i^2 I)^{-1} Y,
+\end{aligned}
+\]
+
+as long as \(X^T (x_i^2 I)^{-1}X\) is nonsingular. That is, if \(n > 1\)
+and at least one \(x_i \neq 0\) . The BLUE of \(\beta_0\) is the first
+row of the above matrix \((ii)\) and the BLUE of \(\beta_1\) is the
+second row.
+
+\begin{enumerate}
+\def\labelenumi{(\alph{enumi})}
+\setcounter{enumi}{1}
+\tightlist
+\item
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# library(matlib)}
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{2022}\NormalTok{)}
+\NormalTok{x }\OtherTok{=} \FunctionTok{rnorm}\NormalTok{(}\DecValTok{20}\NormalTok{, }\DecValTok{30}\NormalTok{, }\DecValTok{5}\NormalTok{)}
+\NormalTok{y }\OtherTok{=} \FunctionTok{rnorm}\NormalTok{(}\DecValTok{20}\NormalTok{, }\DecValTok{40}\NormalTok{, }\DecValTok{5}\NormalTok{)}
+
+
+\NormalTok{lm.out}\FloatTok{.3}\NormalTok{b }\OtherTok{=} \FunctionTok{lm}\NormalTok{(y }\SpecialCharTok{\textasciitilde{}}\NormalTok{ x)}
+\NormalTok{xm }\OtherTok{=} \FunctionTok{matrix}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\FunctionTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{, }\AttributeTok{times =} \DecValTok{20}\NormalTok{), x), }\AttributeTok{nrow =} \DecValTok{20}\NormalTok{)}
+\NormalTok{ym }\OtherTok{=} \FunctionTok{as.matrix}\NormalTok{(y)}
+\NormalTok{q  }\OtherTok{=} \FunctionTok{diag}\NormalTok{(}\AttributeTok{x =}\NormalTok{ x}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{, }\AttributeTok{nrow =} \DecValTok{20}\NormalTok{, }\AttributeTok{ncol =} \DecValTok{20}\NormalTok{)}
+
+\NormalTok{beta.hat }\OtherTok{=} \FunctionTok{solve}\NormalTok{(}\FunctionTok{t}\NormalTok{(xm)}\SpecialCharTok{\%*\%}\FunctionTok{solve}\NormalTok{(q)}\SpecialCharTok{\%*\%}\NormalTok{xm)}\SpecialCharTok{\%*\%}\FunctionTok{t}\NormalTok{(xm)}\SpecialCharTok{\%*\%}\FunctionTok{solve}\NormalTok{(q)}\SpecialCharTok{\%*\%}\NormalTok{ym}
+\NormalTok{beta.hat}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##            [,1]
+## [1,] 35.8811172
+## [2,]  0.1709089
+\end{verbatim}
+
+The BLUE of \(\beta_0 = 38.28292797\) and the BLUE of
+\(\beta_1 = 0.08383732\) based on what was derived in (a).
+
+\begin{enumerate}
+\def\labelenumi{(\alph{enumi})}
+\setcounter{enumi}{2}
+\tightlist
+\item
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{lm.out}\FloatTok{.3}\NormalTok{c }\OtherTok{=} \FunctionTok{lm}\NormalTok{(y }\SpecialCharTok{\textasciitilde{}}\NormalTok{ x, }\AttributeTok{weights =} \DecValTok{1}\SpecialCharTok{/}\NormalTok{(x}\SpecialCharTok{**}\DecValTok{2}\NormalTok{))}
+\NormalTok{lm.out}\FloatTok{.3}\NormalTok{c}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = y ~ x, weights = 1/(x^2))
+## 
+## Coefficients:
+## (Intercept)            x  
+##     35.8811       0.1709
+\end{verbatim}
+
+The results are the same as the results in (b). Here, the
+\texttt{weights\ =} option is giving us the inverse of \(V^2\). This is
+since
+\(Y \sim N(\mu, V \sigma^2) \implies \frac{Y}{V} \sim N(\mu, \sigma^2)\).
+
+\hypertarget{problem-4-wheezing-data.}{%
+\subsection{Problem 4 (Wheezing data).}\label{problem-4-wheezing-data.}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{wheeze }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(}\StringTok{\textquotesingle{}data/wheeze\_wmiss.csv\textquotesingle{}}\NormalTok{)}
+\NormalTok{wheeze }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{head}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   case t wheeze kingston age smoke
+## 1    1 1      1        0   9     0
+## 2    1 2      1        0  10     0
+## 3    1 3      1        0  11     0
+## 4    1 4      0        0  12     0
+## 5    2 1      1        1   9     1
+## 6    2 2      1        1  10     2
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(wheeze)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##       case             t            wheeze          kingston     
+##  Min.   : 1.00   Min.   :1.00   Min.   :0.0000   Min.   :0.0000  
+##  1st Qu.: 4.75   1st Qu.:1.75   1st Qu.:0.0000   1st Qu.:0.0000  
+##  Median : 8.50   Median :2.50   Median :0.0000   Median :0.0000  
+##  Mean   : 8.50   Mean   :2.50   Mean   :0.2969   Mean   :0.4531  
+##  3rd Qu.:12.25   3rd Qu.:3.25   3rd Qu.:1.0000   3rd Qu.:1.0000  
+##  Max.   :16.00   Max.   :4.00   Max.   :1.0000   Max.   :1.0000  
+##                                                                  
+##       age            smoke     
+##  Min.   : 9.00   Min.   :0.00  
+##  1st Qu.: 9.75   1st Qu.:0.00  
+##  Median :10.50   Median :1.00  
+##  Mean   :10.50   Mean   :0.78  
+##  3rd Qu.:11.25   3rd Qu.:1.00  
+##  Max.   :12.00   Max.   :2.00  
+##                  NA's   :14
+\end{verbatim}
+
+\begin{enumerate}
+\def\labelenumi{(\alph{enumi})}
+\tightlist
+\item
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{wheeze }\OtherTok{\textless{}{-}}\NormalTok{ wheeze }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{smoke =} \FunctionTok{as.factor}\NormalTok{(smoke)) }
+
+\CommentTok{\# \%\textgreater{}\%}
+\CommentTok{\#   mutate(wheeze = as.factor(wheeze)) \%\textgreater{}\%}
+\CommentTok{\#   mutate(kingston = as.factor(kingston))}
+
+
+\NormalTok{wheeze\_binom }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(wheeze }\SpecialCharTok{\textasciitilde{}}\NormalTok{ ., }\AttributeTok{data =}\NormalTok{ wheeze, }\AttributeTok{family =} \StringTok{"binomial"}\NormalTok{)}
+
+\FunctionTok{summary}\NormalTok{(wheeze\_binom)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## glm(formula = wheeze ~ ., family = "binomial", data = wheeze)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.3820  -0.8890  -0.6402   1.2748   1.7231  
+## 
+## Coefficients: (1 not defined because of singularities)
+##             Estimate Std. Error z value Pr(>|z|)
+## (Intercept) -0.03729    0.99698  -0.037    0.970
+## case         0.03012    0.07016   0.429    0.668
+## t           -0.25530    0.30083  -0.849    0.396
+## kingston     0.61103    0.64974   0.940    0.347
+## age               NA         NA      NA       NA
+## smoke1      -1.16160    0.72795  -1.596    0.111
+## smoke2      -0.67572    0.99893  -0.676    0.499
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 62.687  on 49  degrees of freedom
+## Residual deviance: 58.756  on 44  degrees of freedom
+##   (14 observations deleted due to missingness)
+## AIC: 70.756
+## 
+## Number of Fisher Scoring iterations: 4
+\end{verbatim}
+
+The coefficients for \texttt{smoke1} and \texttt{smoke2} both have a
+p-value of greater than 0.05, thus smoking is not significant at the
+95\% level.
+
+\begin{enumerate}
+\def\labelenumi{(\alph{enumi})}
+\setcounter{enumi}{1}
+\tightlist
+\item
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(lme4)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: package 'lme4' was built under R version 4.1.2
+\end{verbatim}
+
+\begin{verbatim}
+## Loading required package: Matrix
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: package 'Matrix' was built under R version 4.1.2
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{wheeze\_binom\_random\_intercept }\OtherTok{\textless{}{-}} \FunctionTok{glmer}\NormalTok{(wheeze }\SpecialCharTok{\textasciitilde{}}\NormalTok{ t }\SpecialCharTok{+}\NormalTok{ kingston }\SpecialCharTok{+}\NormalTok{ smoke }\SpecialCharTok{+}\NormalTok{ (}\DecValTok{1}\SpecialCharTok{|}\NormalTok{case), }\AttributeTok{family =} \StringTok{\textquotesingle{}binomial\textquotesingle{}}\NormalTok{, }\AttributeTok{data =}\NormalTok{ wheeze)}
+\FunctionTok{summary}\NormalTok{(wheeze\_binom\_random\_intercept)}\SpecialCharTok{$}\NormalTok{coefficients}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##               Estimate Std. Error    z value  Pr(>|z|)
+## (Intercept) -0.2351322  1.2115068 -0.1940825 0.8461113
+## t           -0.2462958  0.3359447 -0.7331440 0.4634706
+## kingston     0.8737005  1.0518742  0.8306131 0.4061922
+## smoke1      -1.0753774  0.9085556 -1.1836121 0.2365667
+## smoke2      -0.8899672  1.3649262 -0.6520258 0.5143845
+\end{verbatim}
+
+The standard errors and p-values get higher in the random intercept
+model. Here the standard errors for \texttt{smoke1} and \texttt{smoke2}
+are 0.91 and 1.36, respectively, compared to 0.73 and 1.0 from the GLM.
+The p-values are 0.24 and 0.51 for the random intercept model, compared
+to 0.11 and 0.50 from the GLM. Perhaps this is due to the lower number
+of observations as the observations go from 64 (total observations) to 4
+(grouped by individual child).
+
+\hypertarget{appendix-all-code-for-this-report}{%
+\section{Appendix: All code for this
+report}\label{appendix-all-code-for-this-report}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{knitr}\SpecialCharTok{::}\NormalTok{opts\_chunk}\SpecialCharTok{$}\FunctionTok{set}\NormalTok{(}\AttributeTok{echo =} \ConstantTok{TRUE}\NormalTok{)}
+\FunctionTok{library}\NormalTok{(dplyr)}
+\CommentTok{\# Regression for cars data}
+\NormalTok{lm.out }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(dist }\SpecialCharTok{\textasciitilde{}}\NormalTok{ speed, }\AttributeTok{data =}\NormalTok{ cars)}
+
+\CommentTok{\# create new predictor }
+\NormalTok{newx }\OtherTok{=} \FunctionTok{seq}\NormalTok{(}\FunctionTok{min}\NormalTok{(cars}\SpecialCharTok{$}\NormalTok{speed), }\FunctionTok{max}\NormalTok{(cars}\SpecialCharTok{$}\NormalTok{speed), }\AttributeTok{by =} \FloatTok{0.1}\NormalTok{)}
+
+\CommentTok{\# get confidence interval for each element in newx}
+\NormalTok{conf\_interval }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(lm.out, }
+                         \AttributeTok{newdata=}\FunctionTok{data.frame}\NormalTok{(}\AttributeTok{speed=}\NormalTok{newx),}
+                         \AttributeTok{interval =} \StringTok{"confidence"}\NormalTok{,}
+                         \AttributeTok{level =} \FloatTok{0.95}\NormalTok{)}
+
+\CommentTok{\# get prediction interval for each element in newx}
+\NormalTok{pred\_interval }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(lm.out,}
+                         \AttributeTok{newdata =} \FunctionTok{data.frame}\NormalTok{(}\AttributeTok{speed=}\NormalTok{newx),}
+                         \AttributeTok{interval =} \StringTok{"prediction"}\NormalTok{,}
+                         \AttributeTok{level =} \FloatTok{0.95}\NormalTok{)}
+\CommentTok{\# plot data points}
+\FunctionTok{plot}\NormalTok{(cars}\SpecialCharTok{$}\NormalTok{speed, cars}\SpecialCharTok{$}\NormalTok{dist, }
+     \AttributeTok{main =} \StringTok{"Regression"}\NormalTok{,}
+     \AttributeTok{xlab =} \StringTok{"Speed"}\NormalTok{,}
+     \AttributeTok{ylab =} \StringTok{"Distance"}\NormalTok{)}
+
+\CommentTok{\# regression line}
+\FunctionTok{abline}\NormalTok{(lm.out, }\AttributeTok{col =} \StringTok{\textquotesingle{}lightblue\textquotesingle{}}\NormalTok{)}
+
+\CommentTok{\# add lower end of CI}
+\FunctionTok{lines}\NormalTok{(newx, conf\_interval[,}\DecValTok{2}\NormalTok{], }\AttributeTok{col =} \StringTok{\textquotesingle{}blue\textquotesingle{}}\NormalTok{, }\AttributeTok{lty =} \DecValTok{2}\NormalTok{)}
+\CommentTok{\# add upper end of CI}
+\FunctionTok{lines}\NormalTok{(newx, conf\_interval[,}\DecValTok{3}\NormalTok{], }\AttributeTok{col =} \StringTok{\textquotesingle{}blue\textquotesingle{}}\NormalTok{, }\AttributeTok{lty =} \DecValTok{2}\NormalTok{)}
+\CommentTok{\# add lower end of PI}
+\FunctionTok{lines}\NormalTok{(newx, pred\_interval[,}\DecValTok{2}\NormalTok{], }\AttributeTok{col =} \StringTok{\textquotesingle{}red\textquotesingle{}}\NormalTok{, }\AttributeTok{lty =} \DecValTok{2}\NormalTok{)}
+\CommentTok{\# add upper end of PI}
+\FunctionTok{lines}\NormalTok{(newx, pred\_interval[,}\DecValTok{3}\NormalTok{], }\AttributeTok{col =} \StringTok{\textquotesingle{}red\textquotesingle{}}\NormalTok{, }\AttributeTok{lty =} \DecValTok{2}\NormalTok{)}
+\CommentTok{\# library(matlib)}
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{2022}\NormalTok{)}
+\NormalTok{x }\OtherTok{=} \FunctionTok{rnorm}\NormalTok{(}\DecValTok{20}\NormalTok{, }\DecValTok{30}\NormalTok{, }\DecValTok{5}\NormalTok{)}
+\NormalTok{y }\OtherTok{=} \FunctionTok{rnorm}\NormalTok{(}\DecValTok{20}\NormalTok{, }\DecValTok{40}\NormalTok{, }\DecValTok{5}\NormalTok{)}
+
+
+\NormalTok{lm.out}\FloatTok{.3}\NormalTok{b }\OtherTok{=} \FunctionTok{lm}\NormalTok{(y }\SpecialCharTok{\textasciitilde{}}\NormalTok{ x)}
+\NormalTok{xm }\OtherTok{=} \FunctionTok{matrix}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\FunctionTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{, }\AttributeTok{times =} \DecValTok{20}\NormalTok{), x), }\AttributeTok{nrow =} \DecValTok{20}\NormalTok{)}
+\NormalTok{ym }\OtherTok{=} \FunctionTok{as.matrix}\NormalTok{(y)}
+\NormalTok{q  }\OtherTok{=} \FunctionTok{diag}\NormalTok{(}\AttributeTok{x =}\NormalTok{ x}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{, }\AttributeTok{nrow =} \DecValTok{20}\NormalTok{, }\AttributeTok{ncol =} \DecValTok{20}\NormalTok{)}
+
+\NormalTok{beta.hat }\OtherTok{=} \FunctionTok{solve}\NormalTok{(}\FunctionTok{t}\NormalTok{(xm)}\SpecialCharTok{\%*\%}\FunctionTok{solve}\NormalTok{(q)}\SpecialCharTok{\%*\%}\NormalTok{xm)}\SpecialCharTok{\%*\%}\FunctionTok{t}\NormalTok{(xm)}\SpecialCharTok{\%*\%}\FunctionTok{solve}\NormalTok{(q)}\SpecialCharTok{\%*\%}\NormalTok{ym}
+\NormalTok{beta.hat}
+\NormalTok{lm.out}\FloatTok{.3}\NormalTok{c }\OtherTok{=} \FunctionTok{lm}\NormalTok{(y }\SpecialCharTok{\textasciitilde{}}\NormalTok{ x, }\AttributeTok{weights =} \DecValTok{1}\SpecialCharTok{/}\NormalTok{(x}\SpecialCharTok{**}\DecValTok{2}\NormalTok{))}
+\NormalTok{lm.out}\FloatTok{.3}\NormalTok{c}
+\NormalTok{wheeze }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(}\StringTok{\textquotesingle{}data/wheeze\_wmiss.csv\textquotesingle{}}\NormalTok{)}
+\NormalTok{wheeze }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{head}\NormalTok{()}
+\FunctionTok{summary}\NormalTok{(wheeze)}
+\NormalTok{wheeze }\OtherTok{\textless{}{-}}\NormalTok{ wheeze }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{smoke =} \FunctionTok{as.factor}\NormalTok{(smoke)) }
+
+\CommentTok{\# \%\textgreater{}\%}
+\CommentTok{\#   mutate(wheeze = as.factor(wheeze)) \%\textgreater{}\%}
+\CommentTok{\#   mutate(kingston = as.factor(kingston))}
+
+
+\NormalTok{wheeze\_binom }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(wheeze }\SpecialCharTok{\textasciitilde{}}\NormalTok{ ., }\AttributeTok{data =}\NormalTok{ wheeze, }\AttributeTok{family =} \StringTok{"binomial"}\NormalTok{)}
+
+\FunctionTok{summary}\NormalTok{(wheeze\_binom)}
+\FunctionTok{library}\NormalTok{(lme4)}
+\NormalTok{wheeze\_binom\_random\_intercept }\OtherTok{\textless{}{-}} \FunctionTok{glmer}\NormalTok{(wheeze }\SpecialCharTok{\textasciitilde{}}\NormalTok{ t }\SpecialCharTok{+}\NormalTok{ kingston }\SpecialCharTok{+}\NormalTok{ smoke }\SpecialCharTok{+}\NormalTok{ (}\DecValTok{1}\SpecialCharTok{|}\NormalTok{case), }\AttributeTok{family =} \StringTok{\textquotesingle{}binomial\textquotesingle{}}\NormalTok{, }\AttributeTok{data =}\NormalTok{ wheeze)}
+\FunctionTok{summary}\NormalTok{(wheeze\_binom\_random\_intercept)}\SpecialCharTok{$}\NormalTok{coefficients}
+\end{Highlighting}
+\end{Shaded}
+
+
+\end{document}

@@ -1,0 +1,185 @@
+---
+title: "Homework 2"
+author: "TJ Sipin"
+date: '2022-07-06'
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+```
+
+## Problem 1 (Statistical thinking).
+
+(a) Consider $\text{Cov}(\textbf{A}y) = \textbf{A}\text{Cov}(y)\textbf{A}^T,$ where $\textbf{A} = (X^T X)^{-1} X^T$ and $y = \beta X + \epsilon$. Taking the notation $$\hat \beta = (X^T X)^{-1} X^T y ,$$ we have $$\begin{align}
+    \text{Cov}(\hat \beta ) &= \text{Cov}((X^T X)^{-1} X^T y) \\
+    &= \text{Cov}((X^T X)^{-1} X^T (X \beta + \epsilon)) \\
+    &= \text{Cov}((X^T X)^{-1} X^T X \beta + (X^T X)^{-1} X^T \epsilon)\\
+    &= \text{Cov} (I \beta + (X^T X)^{-1} X^T \epsilon)\\
+    &= \text{Cov} (X^T X)^{-1} X^T \epsilon) \\
+    &= \text{Cov}(\textbf{A}\epsilon) \\
+    &= \textbf{A}\text{Cov}(\epsilon)\textbf{A}^T \\
+    &= (X^T X)^{-1} X^T \sigma^2 ((X^T X)^{-1} X^T)^T \\
+    &= \sigma^2 (X^T X)^{-1} X^T X \left ((X^T X)^{-1} \right )^T \\
+    &= \sigma^2 (X^T X)^{-1}.
+    \end{align}$$
+
+The variance of $\hat\beta_1$ is given by the second diagonal of the above matrix. That is,
+
+$$
+(i) \qquad 
+\text{Var}(\hat \beta_1 ) = \left [ \sigma^2 (X^T X)^{-1}\right ]_{2,2}.
+$$
+
+(b) Splitting the possible range of $x$ into 100 mutually exclusive windows and collecting the equal amount of sample from each slot is more efficient in terms of estimating $\beta_1$. So when we split the possible range of $x$ into 100 *mutually exclusive* windows, then we decrease variance of $x$, which in turn, decreases the variance of $\hat\beta$, as we see in $(i)$.
+
+## Problem 2 (Prediction and confidence intervals)
+
+```{r problem 2, echo=TRUE}
+# Regression for cars data
+lm.out <- lm(dist ~ speed, data = cars)
+
+# create new predictor 
+newx = seq(min(cars$speed), max(cars$speed), by = 0.1)
+
+# get confidence interval for each element in newx
+conf_interval <- predict(lm.out, 
+                         newdata=data.frame(speed=newx),
+                         interval = "confidence",
+                         level = 0.95)
+
+# get prediction interval for each element in newx
+pred_interval <- predict(lm.out,
+                         newdata = data.frame(speed=newx),
+                         interval = "prediction",
+                         level = 0.95)
+# plot data points
+plot(cars$speed, cars$dist, 
+     main = "Regression",
+     xlab = "Speed",
+     ylab = "Distance")
+
+# regression line
+abline(lm.out, col = 'lightblue')
+
+# add lower end of CI
+lines(newx, conf_interval[,2], col = 'blue', lty = 2)
+# add upper end of CI
+lines(newx, conf_interval[,3], col = 'blue', lty = 2)
+# add lower end of PI
+lines(newx, pred_interval[,2], col = 'red', lty = 2)
+# add upper end of PI
+lines(newx, pred_interval[,3], col = 'red', lty = 2)
+```
+
+The prediction interval is wider than the confidence interval since the confidence interval pertains to the median (at a 95% level), while the prediction interval pertains to all points in the relationship of distance and speed within a 95% level.
+
+## Problem 3 (Weighted least squares).
+
+(a) Derive the BLUE of $\beta_0$ and $\beta_1$ for
+
+$$
+y_i \sim^{\text{indep}} N(\beta_0 + \beta_1 x_i, x_i^2 \sigma^2), \qquad i = 1, \dots, n.
+$$
+
+*Solution.* Here, we have $\epsilon \sim N(0, \sigma^2 \textbf{V}),$ where $\textbf V = x_i^2I, \text{ for } i = 1,\dots, n$. The OLS estimator is BLUE when $\epsilon \sim (0, \sigma^2 I).$ Since $\textbf V$ can be decomposed as $\textbf V = (x_i I) (x_i I)^T$, it follows that
+
+$$
+\text{Cov}((x_i I)^{-1} \epsilon) = \sigma^2 (x_iI)^{-1} x_i I (x_i I)^T ((x_i I )^{-1})^T = \sigma^2 I.
+$$
+
+This allows us to change the OLS problem to
+
+$$
+(x_i I)^{-1}Y = (x_i I)^{-1}X \beta + (x_i I)^{-1} \epsilon, \quad (x_i I)^{-1} \sim N(0, \sigma^2 I).
+$$
+
+Thus, we can get BLUE from the OLS estimator from the changed problem:
+
+$$ (ii)
+\begin{aligned}
+\hat\beta &= (X^T((x_i I)^T)^{-1} (x_i I)^{-1} X)^{-1}((x_i I)^{-1} X)^T (x_i I)^{-1} Y \\
+&= (X^T (x_i I x_i I^T)^{-1} X)^{-1} X^T (x_i I x_i I^T)^{-1} Y \\
+&= (X^T (x_i I x_i I^T)^{-1} X)^{-1} X^T (x_i I x_i I^T)^{-1} Y \\
+&= (X^T(x_i ^2 I)^{-1} X)^{-1} X^T(x_i^2 I)^{-1} Y,
+\end{aligned}
+$$
+
+as long as $X^T (x_i^2 I)^{-1}X$ is nonsingular. That is, if $n > 1$ and at least one $x_i \neq 0$ . The BLUE of $\beta_0$ is the first row of the above matrix $(ii)$ and the BLUE of $\beta_1$ is the second row.
+
+(b) 
+
+```{r}
+# library(matlib)
+set.seed(2022)
+x = rnorm(20, 30, 5)
+y = rnorm(20, 40, 5)
+
+
+lm.out.3b = lm(y ~ x)
+xm = matrix(c(rep(1, times = 20), x), nrow = 20)
+ym = as.matrix(y)
+q  = diag(x = x^2, nrow = 20, ncol = 20)
+
+beta.hat = solve(t(xm)%*%solve(q)%*%xm)%*%t(xm)%*%solve(q)%*%ym
+beta.hat
+```
+
+The BLUE of $\beta_0 = 38.28292797$ and the BLUE of $\beta_1 = 0.08383732$ based on what was derived in (a).
+
+(c) 
+
+```{r}
+lm.out.3c = lm(y ~ x, weights = 1/(x**2))
+lm.out.3c
+```
+
+The results are the same as the results in (b). Here, the `weights =` option is giving us the inverse of $V$. This is since $Y \sim N(\mu, V \sigma^2) \implies \frac{Y}{V} \sim N(\mu, \sigma^2)$.
+
+
+## Problem 4 (Wheezing data).
+
+```{r}
+wheeze <- read.csv('data/wheeze_wmiss.csv')
+wheeze %>% head()
+summary(wheeze)
+```
+
+(a) 
+
+```{r}
+wheeze <- wheeze %>%
+  mutate(smoke = as.factor(smoke)) 
+
+# %>%
+#   mutate(wheeze = as.factor(wheeze)) %>%
+#   mutate(kingston = as.factor(kingston))
+
+
+wheeze_binom <- glm(wheeze ~ . - t, data = wheeze, family = "binomial")
+
+summary(wheeze_binom)
+```
+
+The coefficients for `smoke1` and `smoke2` both have a p-value of greater than 0.05, thus smoking is not significant at the 95% level.
+
+(b)
+
+```{r}
+library(lme4)
+wheeze_binom_random_intercept <- glmer(wheeze ~ kingston + smoke + (1|case), family = 'binomial', data = wheeze)
+summary(wheeze_binom_random_intercept)$coefficients
+```
+
+Here the standard errors for `smoke1` and `smoke2` are 0.91 and 1.35, respectively, compared to 0.73 and 1.0 from the GLM. So the standard errors for the random intercept gets larger for both. Perhaps this is due to the lower number of observations as the observations go from 64 (total observations) to 4 (grouped by individual child). 
+
+The p-values are 0.24 and 0.40 for the random intercept model, compared to 0.11 and 0.50 from the GLM. The p-value for smoke1 gets bigger, while the p-value for smoke2 gets smaller. 
+
+
+# Appendix: All code for this report
+
+```{r ref.label=knitr::all_labels(), echo=TRUE, eval=FALSE}
+```

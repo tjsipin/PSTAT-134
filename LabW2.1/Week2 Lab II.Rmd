@@ -1,0 +1,213 @@
+---
+title: "Week2 Lab II"
+author: "Thiha Aung"
+date: '2022-06-28'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# A little tutorial on stemplot
+
+- a way to represent quantitative data in Graphical Format
+
+- a sideways histogram made of numbers, to assist in visualizing shape of distribution
+
+- To create stem plot, must sort the data first in ascending order
+
+- What is stem and what is leaf? Usually, the leaf contains the last digit of the number and the stem contains all of the other digits.
+
+- For very large numbers, the values may be rounded to a particular place value (such as the hundreds place) that will be used for the leaves. 
+- The remaining digits to the left of the rounded place value are used as the stem.
+
+Example:
+
+```{r}
+stem(cars$dist,scale = 1)
+```
+
+- In this case, the leaf represent ones place and stem represent the rest (tens and higher).
+
+- Decimal is 1 to right.  (leaf).
+ 
+- Leaf unit: 1.0, Stem unit: 10.0. For example, 12 |0 = 120
+
+- Each stem is listed only once and no number is skipped. Example (26 is repeated 4 times). 
+
+- Left-skewed( skewed towards 0)
+
+- We only have 0,2,4,6,.. as stem. What happened to 10 since we have no 1 | 0. Got rounded down to 0 | 0 as we can see.  Similarly, for 14 16 17 18( as 0| 4, 0| 6, 0|7, 0|8)
+
+- Kind of annoying to interpret this, so we can increase scale to get more detailed display.
+
+
+```{r}
+stem(cars$dist, scale = 2)
+```
+
+Here we go.
+
+
+# Box-Cox transformation
+
+- When Non-normality or non-constant variance is violated in regression (Recall LINE assumption).
+
+- Some of the most common transformations are $\sqrt{x}, log(x), \frac{1}{x}$
+
+# Single-Variate Regression
+
+
+## Transforming Y
+Let $\lambda \in \mathbb{R}$ be a new parameter. If $Y_{i}>0$, set
+$$
+Y_{i}^{(\lambda)}= \begin{cases}\frac{Y_{i}^{\lambda}-1}{\lambda} & \lambda \neq 0 \\ \ln \left(Y_{i}\right), & \lambda=0\end{cases}
+$$
+The model is
+$$
+Y_{i}^{(\lambda)}=\beta_{0}+\beta_{1} x_{i}+\varepsilon_{i} \text { where } \varepsilon_{i} \sim N\left(0, \sigma^{2}\right) .
+$$
+The optimal Box-Cox transformation is
+$$
+\hat{\lambda}=\underset{\lambda}{\arg \max } \ell_{p}(\lambda)
+$$
+where $\ell_{p}(\lambda)$ is the (profile) log-likelihood.
+Typically, the final selected $\widehat{\lambda}$ is a "round" number like $-1,-.5,0, .5,1$. The boxcox() function in MASS package computes and optionally plots profile log-likelihoods for the parameter of the Box-Cox power transformation.
+
+Note that the function boxcox() above only works for non-negative response (i.e. $Y_i >= 0$). But there are extensions such as Yeo-Johnson transformation which works for response variable on the $\mathbb{R}$. The function boxCox() in library(car) uses Yeo-Johnson method. 
+
+```{r}
+# load the library Companion to Applied Regression(CAR)
+library(car)
+
+# boxCox transformation for Y
+bcTrans<- boxCox(lm(dist~speed,data = cars), lambda = seq(-1,1,by = .1))
+
+# get optimal boxCox
+
+bcTrans$x[which.max(bcTrans$y)]
+```
+The vertical dotted lines above correspond to 95% CI of the transformation. Here our optimal transformation is $Y^{0.434}$. But we take, $\sqrt{Y}$ since it is in CI and easier to interpret our regression model. 
+
+Let's compare MSE of our regression before and after transformation. 
+
+```{r}
+summary(lm(dist~speed,data=cars))$sigma^2
+
+summary(lm(sqrt(dist)~speed,data=cars))$sigma^2
+```
+
+## Transforming x 
+
+We use the function invTranPlot() in library(car). The criterion is to minimize RSS(residual sum of squares).
+
+$$RSS = \sum_{i=1}^{n}\left(Y_{i}-\widehat{Y}_{i}\right)^{2}$$
+```{r}
+invTranPlot(dist~speed, lambda = c(-1,-0.5,0,0.5,1),optimal = T,data = cars)
+```
+
+Our optimal transformation is $X^{1.78}$. But not transforming also gives us similar RSS. So, we will not transform x(speed). 
+
+
+## Multivariate Regression
+
+$$
+Y_{n \times 1}=\mathbf{X}_{n \times p} \beta_{p \times 1}+\epsilon_{n \times 1}, \quad \epsilon \sim \mathcal{N}\left(0, \sigma^{2} \mathbf{I}_{n}\right)
+$$
+- Y: continuous case (presumably Gaussian)
+
+- $\mathbf{X}_{n \times p}$ : design matrix (assume full rank)
+
+- OLS Estimates: $\hat{\beta}=\left(\mathbf{X}^{T} \mathbf{X}\right)^{-1} \mathbf{X}^{T} Y$
+
+- OLS estimator is BLUE (Best Linear Unbiased Estimator)
+
+- We made an estimator using a linear combination of $Y$.
+
+- The fitted values $\mathbf{X}\left(\mathbf{X}^{T} \mathbf{X}\right)^{-1} \mathbf{X}^{T} Y$ are also a linear combination of $Y$, and weight is determined by $X$.
+
+Let's start multivariate transformation. 
+
+Begin with the design matrix $\mathbf{X}$ above. 
+
+- Step 1 Isolate numeric predictors (not interactions) into a design matrix $\mathbf{X}_{c}$, which is $n \times k$.
+
+
+- Step 2 Use a multivariate version of Box-Cox [powerTransform()] so that $\left(\begin{array}{c}x_{11} \\ \vdots \\ x_{1 k}\end{array}\right),\left(\begin{array}{c}x_{21} \\ \vdots \\ x_{2 k}\end{array}\right), \cdots,\left(\begin{array}{c}x_{n 1} \\ \vdots \\ x_{n k}\end{array}\right)$ have a multivariate normal distribution. This gives the transformation parameters $\lambda_{1}, \ldots, \lambda_{k}$.
+
+
+- Step 3 Replace $x_{i j}$ with $x_{i j}^{\left(\lambda_{j}\right)}$. Update the design matrix $\mathbf{X}$ using $x_{i j}^{\left(\lambda_{j}\right)}$.
+
+
+- Step 4 Use the ordinary Box-Cox method on the response $Y_{i}$.
+The powerTransform() function in the car package is the central tool for helping to choose predictor transformations.
+
+
+```{r}
+physical <- read.table('physical.txt', header = TRUE)
+rownames(physical) <- physical[, 1]  ## set rownames
+physical <- physical[, -1]           ## remove the first variable
+
+head(physical)
+
+# power-transform X to have multivariate normal distribution
+
+pt <- powerTransform(cbind(LeftArm,LeftFoot,LeftHand,HeadCirc,nose)~1, physical)
+
+summary(pt)
+```
+
+No transformation to any predictor except LeftArm which is transformed to log. 
+
+Let's see any necessary transformation for Y.
+
+
+```{r}
+boxCox(lm(Height ~ log(LeftArm)+LeftFoot+LeftHand+HeadCirc+nose, data = physical))
+```
+
+Even though optimal $\lambda$ says otherwise, no transformation is included in 95% CI. So, it's okay to not transform. 
+
+
+# Code for Regression, CI, PI plot
+
+Recall lecture notes regarding CI and PI intervals. 
+
+```{r}
+
+# Regression for cars data
+lm.out <- lm(dist ~ speed,data=cars)
+
+# create new predictor(speed)
+newx = seq(min(cars$speed),max(cars$speed),by = 0.1)
+
+# get confidence interval for each element in newx
+
+conf_interval <- predict(lm.out, newdata=data.frame(speed=newx), interval="confidence",level = 0.95)
+
+# get prediction interval for each element in newx
+
+pred_interval <- predict(lm.out, newdata=data.frame(speed=newx), interval="prediction",level = 0.95)
+
+#plot data points 
+plot(cars$speed,cars$dist, main = "Regression",xlab = "Speed", ylab = "Distance")
+
+#add regression line
+abline(lm.out, col="lightblue")
+
+# add lower end of CI
+lines(newx, conf_interval[,2], col="blue", lty=2)
+# add upper end of CI
+lines(newx, conf_interval[,3], col="blue", lty=2)
+# add lower end of PI
+lines(newx, pred_interval[,2], col="red", lty=2)
+#add upper end of CI
+lines(newx, pred_interval[,3], col="red", lty=2)
+
+
+```
+ This is the end. 
