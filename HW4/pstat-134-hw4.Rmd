@@ -13,7 +13,7 @@ library(dplyr)
 
 ## Problem 1 (Gaussian Copula).
 
-We derive an algorithm to generate two RVs $X_1 \sim \text{Exp}(1)$ and $X_2 \sim \text{Exp$(3).
+We derive an algorithm to generate two RVs $X_1 \sim \text{Exp}(1)$ and $X_2 \sim \text{Exp}(3)$.
 
 ```{r cars}
 # independent case: get input from uniform distribution
@@ -33,7 +33,6 @@ plot(X2_ind, X1_ind)
 ```
 
 This plot is relatively homoscedastic, though there is more concentration closer to the origin, due to the inverse CDF $F^{-1}(U) = \frac{1}{\lambda}\log(1-U)$ used to obtain our samples.
-
 
 ```{r}
 # helper function for n dim gaussian vector generation
@@ -76,10 +75,11 @@ ggplot(data = x_df) +
 
 Here, we see that there is less homoscedasticity from the correlation coefficient $\rho(X_1,X_2) = 0.7$ We still see that the majority of points tend to group around the origin, again from the inverse CDF used to obtain the samples.
 
-
 ## Problem 2 (Monte Carlo simulation)
 
-To solve this problem, we first recognize that the area encompassed by $CKD$ is the same as the area encompassed by $CAD \cap \not {AKD}$. This can be done using Monte Carlo simulation, producing a ratio of points within a drawn quarter radius $\sqrt{x^2 + y^2}$. Then subtract from it the ratio of points within the former quarter radius and the quarter radius given by $\sqrt{(x-1)^2 + y^2}$. Note that $x, y \in [0,1]$. 
+To solve this problem, we first recognize that the area encompassed by $CKD$ is the same as the area encompassed by $CAD \cap \not {AKD}$. This can be done using Monte Carlo simulation, producing a ratio of points within a drawn quarter radius $\sqrt{x^2 + y^2}$. Then subtract from it the ratio of points within the former quarter radius and the quarter radius given by $\sqrt{(x-1)^2 + y^2}$. Note that $x, y \in [0,1]$.
+
+![](C:/Users/TJ/AppData/Local/RStudio/tmp/paste-98B1229C.png)
 
 ```{r}
 u1 <- runif(1000)
@@ -91,14 +91,15 @@ AKD <- ifelse((r1 <= 1) & (r2 <=1), 1, 0)
 sum(CAD)/1000 - sum(AKD)/1000
 ```
 
+Here, we see that the approximate area is about $0.162$.
 
 ## Problem 3 (M-H & Gibbs Sampler)
 
 Our target density is $f(x,y,z) = C \exp(-(x+y+z+xy+yz+xz))$ for some unknown but fixed constant $C$ and $x,y,z > 0$.
 
-(a)
+(a) 
 
-We use the Metropolis Hastings Sampler to estimate $\mathbb E (XYZ)$. In this approach, we use the standard normal transition kernel to simplify our ratio $r_n$. 
+We use the Metropolis Hastings Sampler to estimate $\mathbb E (XYZ)$. In this approach, we use the standard normal transition kernel to simplify our ratio $r_n$.
 
 ```{r}
 set.seed(1)
@@ -157,13 +158,12 @@ for (i in seq(1,niter)) {
   theta[i] = a[[1]][i]*a[[2]][i]*a[[3]][i]
 }
 result <- (1/(niter-500))*sum(theta[(burn_in+1):niter])
-print(paste('E(XYZ) = ', result))
+result
 ```
 
-From the Metropolis Hastings Sampler, we estimate that $\mathbb E (XYZ) = 0.087152477155928$ with burn-in period set to 500 and number of iterations set to 10,000. We use the formula $\frac{ \sum_{i = 501} ^{10,000} X_i Y_i Z_i}{10,000 - 500}$.
+From the Metropolis Hastings Sampler, we estimate that $\mathbb E (XYZ) \approx 0.087$ with burn-in period set to 500 and number of iterations set to 10,000. We use the formula $\mathbb E (XYZ) \approx \frac{ \sum_{i = 501} ^{10,000} X_i Y_i Z_i}{10,000 - 500}$.
 
-
-(b)
+(b) 
 
 The Gibbs Sampling algorithm is the exact same as the Metropolis-Hastings algorithm, except at each time step $t$, we always move to another state. After randomly drawing the index $i$ of components to choose which vector component to move, we sample from the conditional distribution $p(x_i | x_{-i})$, where $x_{-i}$ is the set of all components not $x_i$.
 
@@ -183,8 +183,6 @@ $$
 So depending on which index we randomly choose, we sample the new state from one of the above distributions.
 
 ```{r gibbs 3}
-library(cubature)
-library(calculus)
 
 gibbs <- function(niter,start_pt){ 
   X = c(start_pt[1], numeric(niter))
@@ -229,6 +227,47 @@ result
 
 ```
 
-From the Gibbs Sampler, we estimate that $\mathbb{E}(XYZ) = 0.08905299$, with initial point at $(1,1,1)$ using the same burn-in period and formula from part (a). This is very similar to the result from the Metropolis-Hastings Sampler, so we are satisfied.
+From the Gibbs Sampler, we estimate that $\mathbb{E}(XYZ) \approx 0.089$, with initial point at $(1,1,1)$ using the same burn-in period and formula from part (a). This is very similar to the result from the Metropolis-Hastings Sampler, so we are satisfied.
 
 ## Problem 4 (SIR)
+
+We use the SIR algorithm to generate some permutation $(X_1, \dots, X_{100})$ where $X_i = 1, \dots, 100$ and $i = 1, \dots, 100$ and $X_i \neq X_j$ if $i \neq j$. Our target distribution is a random vector from a conditional distribution $L | T > 285000$, where $T \equiv \sum_{i = 1}^{100} i X_i.$
+
+First, we take $n = 10000$ samples to put in our `priors` matrix of dimension $100 \times n$, where each column is a random permutation. We would take $100!$ samples if we wanted a complete set of all permutations, however, life doesn't always give what we need due to computing limitations. We calculate $T$ for each sample and save it in a vector. Then we compute the weights, an indicator function on whether each $T$ at each index $i$ is greater than our threshold $285000$, and normalize them to use when sampling.
+
+```{r}
+### create X1,...,X100 first
+set.seed(123)
+
+
+# algorithm start
+# step 1: sample from g_0(l) 10000 times
+# aka sample L 10000 times
+n = 10000
+
+priors <- matrix(0, nrow = 100, ncol = n)
+T <- c(numeric(n))
+for (i in 1:n){
+  T[i] = 0
+  priors[,i] <- sample(seq(1,100), 100)
+  for (j in seq(1,100)) {
+    T[i] = T[i] + (j * priors[,i][j])
+  }
+}
+
+# step 2: compute weights, note wi = f_0/g_0 = 
+weights = rep(0, n)
+for (i in 1:n) {
+  if (T[i] > 285000) {
+    weights[i] = 1
+  }
+}
+
+# normalize weights
+weights = weights / sum(weights)
+
+# step 3: get 1 sample from posterior f(L|T > 285000)
+posteriors <- priors[,sample(ncol(priors), size = 1, replace = TRUE, prob = weights)]
+
+posteriors
+```
